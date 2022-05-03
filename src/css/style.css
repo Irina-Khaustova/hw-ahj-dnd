@@ -1,0 +1,72 @@
+.container {
+  width: 700px;
+  margin: auto;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  color: #999;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  border: 2px solid rgba(5, 41, 41, 0.94);
+}
+
+.column {
+  width: 210px;
+  border: 1px solid rgb(31, 133, 70);
+  border-radius: 5px;
+  box-sizing: border-box;
+  background-color: rgb(198, 205, 200);
+  margin: 5px;
+}
+
+.card {
+  border: 2px solid rgba(5, 41, 41, 0.94);
+  background-color: rgb(142, 226, 226);
+  border-radius: 5px;
+  min-height: 40px;
+  padding: 20px;
+  margin: 5px;
+  box-sizing: border-box;
+  color: #999;
+}
+
+.empty {
+  background-color: rgb(169, 176, 171);
+  border-radius: 5px;
+  height: 60px;
+  padding: 20px;
+  margin: 5px;
+  box-sizing: border-box;
+  color: #999;
+}
+
+p {
+  margin: 0;
+} 
+
+.button-add {
+  width: 15px;
+}
+
+.close {
+  width: 10px;
+  height: 10px;
+  background-image: url("../img/close.svg");
+  position: absolute;
+  right: 0px;
+  display: none;
+}
+
+.card.dragged {
+  border: 2px solid rgba(5, 41, 41, 0.94);
+  background-color: rgb(142, 226, 226);
+  border-radius: 5px;
+  min-height: 10px;
+  padding: 20px;
+  margin: 5px;
+  position: absolute;
+  z-index: 50;
+}
