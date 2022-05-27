@@ -1,5 +1,5 @@
 .container {
-  width: 700px;
+  width: 695px;
   margin: auto;
   top: 0;
   bottom: 0;
@@ -10,16 +10,23 @@
   flex-direction: row;
   flex-wrap: wrap;
   align-items: flex-start;
+  justify-content: center;
   border: 2px solid rgba(5, 41, 41, 0.94);
 }
 
+
+
 .column {
-  width: 210px;
+  width: 31%;
   border: 1px solid rgb(31, 133, 70);
   border-radius: 5px;
   box-sizing: border-box;
   background-color: rgb(198, 205, 200);
   margin: 5px;
+}
+
+h2 {
+  margin: 10px;
 }
 
 .card {
@@ -31,6 +38,7 @@
   margin: 5px;
   box-sizing: border-box;
   color: #999;
+  position: relative;
 }
 
 .empty {
@@ -38,9 +46,10 @@
   border-radius: 5px;
   height: 60px;
   padding: 20px;
-  margin: 5px;
   box-sizing: border-box;
   color: #999;
+  z-index: 10;
+  margin: 5px;
 }
 
 p {
@@ -48,16 +57,20 @@ p {
 } 
 
 .button-add {
-  width: 15px;
+  width: 40px;
+}
+
+.add-button {
+  margin: 10px;
 }
 
 .close {
-  width: 10px;
-  height: 10px;
+  width: 15px;
+  height: 15px;
+  padding: 0;
   background-image: url("../img/close.svg");
   position: absolute;
   right: 0px;
-  display: none;
 }
 
 .card.dragged {

@@ -1,65 +1,90 @@
 export default class Card {
-  constructor(elem, state) {
+  constructor(elem) {
     this.elem = elem;
     this.column = elem.querySelector('.add-button');
     this.container = document.querySelector('.container');
-    this.cardList = {
-      todo: [],
-      progress: [],
-      done: [],
-    };
-    this.state = state;
+    this.cardList = JSON.parse(window.localStorage.getItem('cardList')) || { todo: [], progress: [], done: [] };
     this.count = 0;
-    // this.updateState();
+  }
+
+  draw() {
+    this.cardList.todo.forEach((elem) => {
+      this.drawCard(elem.value, document.querySelector('.todo'), elem.id);
+    });
+    this.cardList.progress.forEach((el) => {
+      this.drawCard(el.value, document.querySelector('.progress'), el.id);
+    });
+    this.cardList.done.forEach((e) => {
+      this.drawCard(e.value, document.querySelector('.done'), e.id);
+    });
+    this.updateState();
+  }
+
+  drawCard(value, col, id) {
+    this.card = document.createElement('div');
+    const close = document.createElement('button');
+    if (value) {
+      this.card.classList.add('card');
+      this.card.textContent = value;
+      close.classList.add('close-button');
+      this.card.id = id;
+      col.insertBefore(this.card, col.querySelector('.add-button'));
+      this.card.addEventListener('mouseenter', (ev) => {
+        ev.preventDefault();
+        if (ev.target.classList.contains('card')) {
+          ev.target.appendChild(close);
+          close.classList.add('close');
+        }
+      });
+      this.card.addEventListener('click', (closeBut) => {
+        if (closeBut.target.classList.contains('close-button')) {
+          const removeEl = closeBut.target.parentElement;
+          this.cardList[`${removeEl.parentElement.classList[1]}`].forEach((el) => {
+            if (el.id === `${removeEl.id}`) {
+              this.cardList[`${removeEl.parentElement.classList[1]}`].splice(this.cardList[`${removeEl.parentElement.classList[1]}`].indexOf(el), 1);
+            }
+          });
+          this.updateState();
+          removeEl.remove();
+        }
+      });
+      this.card.addEventListener('mouseleave', (e1) => {
+        e1.target.querySelector('.close').remove();
+      });
+    }
   }
 
   createCard() {
-    const input = document.createElement('input');
-    const buttonAdd = document.createElement('button');
-    buttonAdd.classList.add('button-add');
-    this.elem.appendChild(input);
-    buttonAdd.textContent = 'Add';
-    this.elem.appendChild(buttonAdd);
-    const card = document.createElement('div');
-    const close = document.createElement('button');
-
-    buttonAdd.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (input.value) {
-        card.classList.add('card');
-        card.textContent = input.value;
-        close.classList.add('close');
-        card.appendChild(close);
-        this.elem.insertBefore(card, this.column);
-        input.remove();
-        buttonAdd.remove();
-        const cards = this.cardList[`${card.parentElement.classList[1]}`];
-        cards.push(card);
-        this.cardList[`${card.parentElement.classList[1]}`] = cards;
-        // console.log(this.cardList[`${card.parentElement.classList[1]}`])
-        // console.log(this.cardList);
-        this.count += 1;
-        // console.log(this.count)
-        this.updateState();
-        // return this.cardList;
+    this.container.addEventListener('click', (e) => {
+      if (e.target.parentElement.querySelector('.button-add')) {
+        return;
       }
-    });
-    card.addEventListener('mouseenter', (e) => {
-      // console.log(e.target);
-      if (e.target.classList.contains('card')) {
-        const elem = e.target.querySelector('.close');
-        elem.style.display = 'block';
-        // console.log(e.target.querySelector('.close'))
+      if (e.target.classList.contains('add-button')) {
+        const input = document.createElement('input');
+        const buttonAdd = document.createElement('button');
+        buttonAdd.classList.add('button-add');
+        buttonAdd.textContent = 'Add';
+        e.target.parentElement.appendChild(input);
+        e.target.parentElement.appendChild(buttonAdd);
+        buttonAdd.addEventListener('click', (el) => {
+          el.preventDefault();
+          const target = e.target.parentElement;
+          const id = `${input.value} + ${Math.random()}`;
+          this.cardList[buttonAdd.parentElement.classList[1]].push({ value: `${input.value}`, id: `${id}` });
+          this.updateState();
+          this.drawCard(input.value, target, id);
+          input.remove();
+          buttonAdd.remove();
+        });
       }
-    });
-    card.addEventListener('mouseout', (e) => {
-      e.target.querySelector('.close').style.display = 'none';
     });
     this.updateState();
     // console.log(this.cardList)
   }
 
   dragging() {
+    this.draggedEl = null;
+    this.ghostEl = null;
     this.empteEl = document.createElement('div');
     const container = document.querySelector('.container');
     container.addEventListener('mousedown', (evt) => {
@@ -70,7 +95,6 @@ export default class Card {
       evt.preventDefault();
       document.body.style.cursor = 'grabbing';
       this.draggedEl = evt.target;
-      // console.log(this.draggedEl.getBoundingClientRect());
       this.ghostEl = evt.target.cloneNode(true);
       this.ghostEl.classList.add('dragged');
       this.ghostEl.style.transform = 'rotate(5deg)';
@@ -90,54 +114,82 @@ export default class Card {
       this.column = this.draggedEl.closest('.column');
       this.column.insertBefore(this.empteEl, this.draggedEl);
       this.empteEl.classList.add('empty');
+      this.cardList[this.column.classList[1]].forEach((el) => {
+        if (el.id === this.draggedEl.id) {
+          this.cardList[this.column.classList[1]]
+            .splice(this.cardList[this.column.classList[1]].indexOf(el), 1);
+          this.updateState();
+        }
+      });
       this.column.removeChild(this.draggedEl);
-      // console.log(this.draggedEl.style.width);
     });
 
-    document.body.addEventListener('mousemove', (evt) => {
+    container.addEventListener('mousemove', (evt) => {
       evt.preventDefault();// не даём выделять элементы
       if (!this.draggedEl) {
+        this.empteEl.remove();
         return;
       }
       this.ghostEl.style.left = `${evt.clientX - this.left}px`;
       this.ghostEl.style.top = `${evt.clientY - this.top}px`;
+      this.ghostEl.style.pointerEvents = 'none';
       this.posEl = document.elementFromPoint(evt.clientX, evt.clientY);
-      // console.log(this.posEl);
-      if (this.posEl.classList.contains('.card')) {
-        // this.middle = this.posEl.getBoundingClientRect().y + this.posEl.offsetHeight / 2;
-        if (this.posEl) {
-          this.posEl.parentElement.inserBefore(this.empteEl, this.posEl);
+      if (this.posEl.classList.contains('card')) {
+        this.middle = this.posEl.getBoundingClientRect().y + this.posEl.offsetHeight / 2;
+        if (evt.pageY < this.middle) {
+          this.posEl.parentElement.insertBefore(this.empteEl, this.posEl);
         } else {
           this.posEl.parentElement.insertBefore(this.empteEl, this.posEl.nextSibling);
         }
+      } else if (this.posEl.classList.contains('column')) {
+        this.posEl.insertBefore(this.empteEl, this.posEl.lastElementChild);
       }
     });
-    document.body.addEventListener('mouseleave', () => { // при уходе курсора за границы контейнера - отменяем перенос
+    container.addEventListener('mouseleave', () => { // при уходе курсора за границы контейнера - отменяем перенос
       if (!this.draggedEl) {
         return;
       }
       document.body.removeChild(this.ghostEl);
       this.ghostEl = null;
-      this.draggedEl = null;
+      this.column.insertBefore(this.draggedEl, this.empteEl);
+      this.empteEl.remove();
     });
-    document.body.addEventListener('mouseup', (evt) => {
+    container.addEventListener('mouseup', (event) => {
       if (!this.draggedEl) {
         return;
       }
-      evt.preventDefault();
-      document.body.removeChild(this.ghostEl);
-      this.closest = document.elementFromPoint(evt.clientX, evt.clientY);
-      // console.log(this.closest)
+      event.preventDefault();
+      this.closest = document.elementFromPoint(event.clientX, event.clientY);
+      this.ghostEl.style.pointerEvents = 'auto';
       this.parentEl = this.closest.parentElement;
-      // console.log(this.parentEl)
       if (this.parentEl.classList.contains('column')) {
+        const add = { value: `${this.draggedEl.textContent}`, id: `${this.draggedEl.id}` };
+        let index;
+        if (this.closest.classList.contains('empty')) {
+          this.cardList[this.parentEl.classList[1]].forEach((el) => {
+            if (el.id === this.closest.previousSibling.id) {
+              index = this.cardList[this.parentEl.classList[1]].indexOf(el);
+            }
+          });
+        } else {
+          this.cardList[this.parentEl.classList[1]].forEach((el) => {
+            if (el.id === this.closest.id) {
+              index = this.cardList[this.parentEl.classList[1]].indexOf(el);
+            }
+          });
+        }
         this.parentEl.insertBefore(this.draggedEl, this.closest);
+        this.cardList[this.parentEl.classList[1]].splice(index + 1, 0, add);
+        this.updateState();
+        document.body.removeChild(this.ghostEl);
+        this.draggedEl = null;
+        this.empteEl.remove();
+        document.body.style.cursor = 'pointer';
       }
     });
   }
 
   updateState() {
     window.localStorage.setItem('cardList', JSON.stringify(this.cardList));
-    // console.log(window.localStorage)
   }
 }
