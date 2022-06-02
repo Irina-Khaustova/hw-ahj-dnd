@@ -1,10 +1,10 @@
 export default class Card {
   constructor(elem) {
     this.elem = elem;
-    this.column = elem.querySelector('.add-button');
+    // this.column = elem.querySelector('.add-button');
     this.container = document.querySelector('.container');
     this.cardList = JSON.parse(window.localStorage.getItem('cardList')) || { todo: [], progress: [], done: [] };
-    this.count = 0;
+    // this.count = 0;
   }
 
   draw() {
