@@ -5,7 +5,7 @@
   bottom: 0;
   right: 0;
   left: 0;
-  color: #999;
+  color: rgb(26, 165, 149);
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -18,11 +18,11 @@
 
 .column {
   width: 31%;
-  border: 1px solid rgb(31, 133, 70);
   border-radius: 5px;
   box-sizing: border-box;
-  background-color: rgb(198, 205, 200);
+  background-color: rgb(152, 234, 208);
   margin: 5px;
+  font-family: sans-serif;
 }
 
 h2 {
@@ -30,24 +30,26 @@ h2 {
 }
 
 .card {
-  border: 2px solid rgba(5, 41, 41, 0.94);
-  background-color: rgb(142, 226, 226);
+  color: #63e6c9;
+  border: 2px solid (5, 41, 41, 0.94);
+  background-color: rgb(208, 249, 235);
   border-radius: 5px;
   min-height: 40px;
   padding: 20px;
   margin: 5px;
   box-sizing: border-box;
-  color: #999;
+  color: #63e6c9;
   position: relative;
+  font-family: sans-serif;
 }
 
 .empty {
-  background-color: rgb(169, 176, 171);
+  background-color: rgb(127, 209, 182);
   border-radius: 5px;
   height: 60px;
   padding: 20px;
   box-sizing: border-box;
-  color: #999;
+  color: rgb(152, 234, 208);
   z-index: 10;
   margin: 5px;
 }
@@ -74,8 +76,8 @@ p {
 }
 
 .card.dragged {
-  border: 2px solid rgba(5, 41, 41, 0.94);
-  background-color: rgb(142, 226, 226);
+  border: 2px solid rg(5, 41, 41, 0.94);
+  background-color: rgb(208, 249, 235);
   border-radius: 5px;
   min-height: 10px;
   padding: 20px;

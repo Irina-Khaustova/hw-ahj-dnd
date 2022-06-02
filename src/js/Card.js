@@ -124,7 +124,7 @@ export default class Card {
       this.column.removeChild(this.draggedEl);
     });
 
-    container.addEventListener('mousemove', (evt) => {
+    document.addEventListener('mousemove', (evt) => {
       evt.preventDefault();// не даём выделять элементы
       if (!this.draggedEl) {
         this.empteEl.remove();
@@ -134,57 +134,42 @@ export default class Card {
       this.ghostEl.style.top = `${evt.clientY - this.top}px`;
       this.ghostEl.style.pointerEvents = 'none';
       this.posEl = document.elementFromPoint(evt.clientX, evt.clientY);
-      if (this.posEl.classList.contains('card')) {
-        this.middle = this.posEl.getBoundingClientRect().y + this.posEl.offsetHeight / 2;
-        if (evt.pageY < this.middle) {
-          this.posEl.parentElement.insertBefore(this.empteEl, this.posEl);
-        } else {
-          this.posEl.parentElement.insertBefore(this.empteEl, this.posEl.nextSibling);
+      if (this.posEl) {
+        if (this.posEl.classList.contains('card')) {
+          this.middle = this.posEl.getBoundingClientRect().y + this.posEl.offsetHeight / 2;
+          if (evt.pageY < this.middle) {
+            this.posEl.parentElement.insertBefore(this.empteEl, this.posEl);
+          } else {
+            this.posEl.parentElement.insertBefore(this.empteEl, this.posEl.nextSibling);
+          }
+        } else if (this.posEl.classList.contains('column')) {
+          this.posEl.insertBefore(this.empteEl, this.posEl.lastElementChild);
         }
-      } else if (this.posEl.classList.contains('column')) {
-        this.posEl.insertBefore(this.empteEl, this.posEl.lastElementChild);
       }
     });
-    container.addEventListener('mouseleave', () => { // при уходе курсора за границы контейнера - отменяем перенос
-      if (!this.draggedEl) {
-        return;
-      }
-      document.body.removeChild(this.ghostEl);
-      this.ghostEl = null;
-      this.column.insertBefore(this.draggedEl, this.empteEl);
-      this.empteEl.remove();
-    });
-    container.addEventListener('mouseup', (event) => {
+    document.addEventListener('mouseup', (event) => {
       if (!this.draggedEl) {
         return;
       }
       event.preventDefault();
-      this.closest = document.elementFromPoint(event.clientX, event.clientY);
-      this.ghostEl.style.pointerEvents = 'auto';
-      this.parentEl = this.closest.parentElement;
-      if (this.parentEl.classList.contains('column')) {
+      if (this.empteEl) {
+        const closest = this.empteEl.closest('.column');
+        let index = 0;
         const add = { value: `${this.draggedEl.textContent}`, id: `${this.draggedEl.id}` };
-        let index;
-        if (this.closest.classList.contains('empty')) {
-          this.cardList[this.parentEl.classList[1]].forEach((el) => {
-            if (el.id === this.closest.previousSibling.id) {
-              index = this.cardList[this.parentEl.classList[1]].indexOf(el);
+        this.cardList[closest.classList[1]].forEach((el) => {
+          if (this.draggedEl.previousSibling) {
+            if (el.id === this.draggedEl.previousSibling.id) {
+              index = this.cardList[closest.classList[1]].indexOf(el);
             }
-          });
-        } else {
-          this.cardList[this.parentEl.classList[1]].forEach((el) => {
-            if (el.id === this.closest.id) {
-              index = this.cardList[this.parentEl.classList[1]].indexOf(el);
-            }
-          });
-        }
-        this.parentEl.insertBefore(this.draggedEl, this.closest);
-        this.cardList[this.parentEl.classList[1]].splice(index + 1, 0, add);
+          }
+        });
+        this.cardList[closest.classList[1]].splice(index + 1, 0, add);
         this.updateState();
-        document.body.removeChild(this.ghostEl);
+        this.empteEl.replaceWith(this.draggedEl);
         this.draggedEl = null;
         this.empteEl.remove();
         document.body.style.cursor = 'pointer';
+        document.body.removeChild(this.ghostEl);
       }
     });
   }
