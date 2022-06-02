@@ -88,7 +88,7 @@ export default class Card {
     this.empteEl = document.createElement('div');
     const container = document.querySelector('.container');
     container.addEventListener('mousedown', (evt) => {
-      // console.log(evt.target);
+      // console.log(container);
       if (!evt.target.classList.contains('card')) {
         return;
       }
